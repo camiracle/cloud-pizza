@@ -3,22 +3,30 @@ import { Pizza, PizzaToppingIngredient as PizzaToppingType } from './shared/type
 import { PizzaOrder } from './shared/types/pizza-order';
 import { PizzaState } from './shared/types/pizza-state';
 
-export const handler = async function (request?: PizzaOrder): Promise<PizzaState> {
+export const handler = async function (request?: PizzaOrder): Promise<ValidateOrderResponse> {
   console.log('Requested Pizza :', JSON.stringify(request, undefined, 2));
-  let response = JSON.parse(JSON.stringify(request));
-  response.isValid = true;
 
   const pizzas = request?.pizzas;
+  let isOrderValid = true;
+  let errorMessage;
 
   // Validate request
   if (!pizzas || pizzas.length == 0) {
-    response.isValid = false;
-    response.errorMessage = NoPizzaMessage;
+    isOrderValid = false;
+    errorMessage = NoPizzaMessage;
   }
   if (pizzas?.find((p) => p.toppings?.find((t) => t.ingredient === PizzaToppingType.Pineapple))) {
-    response.isValid = false;
-    response.errorMessage = NoPineappleMessage;
+    isOrderValid = false;
+    errorMessage = NoPineappleMessage;
   }
 
-  return response;
+  const result = { isOrderValid: isOrderValid, errorMessage: errorMessage };
+  console.log(result);
+
+  return result;
 };
+
+interface ValidateOrderResponse {
+  isOrderValid: boolean;
+  errorMessage?: string;
+}
