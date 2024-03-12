@@ -1,4 +1,4 @@
-import { NoPineappleMessage, NoPizzaMessage } from './shared/error-messages';
+import { PineappleNotAllowedMessage, MissingPizzaMessage } from './shared/error-messages';
 import { Pizza, PizzaToppingIngredient as PizzaToppingType } from './shared/types/pizza';
 import { PizzaOrder } from './shared/types/pizza-order';
 import { PizzaState } from './shared/types/pizza-state';
@@ -13,11 +13,11 @@ export const handler = async function (request?: PizzaOrder): Promise<ValidateOr
   // Validate request
   if (!pizzas || pizzas.length == 0) {
     isOrderValid = false;
-    errorMessage = NoPizzaMessage;
+    errorMessage = MissingPizzaMessage;
   }
   if (pizzas?.find((p) => p.toppings?.find((t) => t.ingredient === PizzaToppingType.Pineapple))) {
     isOrderValid = false;
-    errorMessage = NoPineappleMessage;
+    errorMessage = PineappleNotAllowedMessage;
   }
 
   const result = { isOrderValid: isOrderValid, errorMessage: errorMessage };

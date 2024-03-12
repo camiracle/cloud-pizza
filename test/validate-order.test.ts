@@ -4,8 +4,11 @@ import {
   PizzaToppingIngredient,
   PizzaToppingLocation,
 } from '../lambda-fns/shared/types/pizza';
-import { handler } from '../lambda-fns/request-pizza';
-import { NoPineappleMessage, NoPizzaMessage } from '../lambda-fns/shared/error-messages';
+import { handler } from '../lambda-fns/validate-order';
+import {
+  PineappleNotAllowedMessage,
+  MissingPizzaMessage,
+} from '../lambda-fns/shared/error-messages';
 
 test('Say no to pineapple', async () => {
   const request = {
@@ -30,8 +33,8 @@ test('Say no to pineapple', async () => {
   };
 
   const result = await handler(request);
-  expect(result.isValid).toBe(false);
-  expect(result.errorMessage).toBe(NoPineappleMessage);
+  expect(result.isOrderValid).toBe(false);
+  expect(result.errorMessage).toBe(PineappleNotAllowedMessage);
 });
 
 test('Request is invalid if no pizza', async () => {
@@ -41,8 +44,8 @@ test('Request is invalid if no pizza', async () => {
   };
 
   const result = await handler(request);
-  expect(result.isValid).toBe(false);
-  expect(result.errorMessage).toBe(NoPizzaMessage);
+  expect(result.isOrderValid).toBe(false);
+  expect(result.errorMessage).toBe(MissingPizzaMessage);
 });
 
 test('Pizzas without panapple are good to go', async () => {
@@ -76,6 +79,6 @@ test('Pizzas without panapple are good to go', async () => {
   };
 
   const result = await handler(request);
-  expect(result.isValid).toBe(true);
+  expect(result.isOrderValid).toBe(true);
   expect(result.errorMessage).toBeUndefined();
 });

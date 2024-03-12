@@ -1,6 +1,6 @@
-import { PizzaState } from './shared/types/pizza-state';
+import { CreateDeliveryOrder, DeliveryOrderResponse } from './shared/services/delivery.service';
+import { PizzaOrder } from './shared/types/pizza-order';
 
-export const handler = async function (request: PizzaState): Promise<PizzaState> {
-  console.log('requested delivery');
-  return request;
+export const handler = async function (request: PizzaOrder): Promise<DeliveryOrderResponse> {
+  return await CreateDeliveryOrder(request);
 };

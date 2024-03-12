@@ -20,17 +20,17 @@ export class StepFunctionStack extends cdk.Stack {
       payloadResponseOnly: true,
     });
 
-    const makePizza = new tasks.LambdaInvoke(this, 'Add pizza to queue', {
+    const makePizza = new tasks.LambdaInvoke(this, 'add pizza to queue', {
       lambdaFunction: props.makePizzaLambda,
       payloadResponseOnly: true,
-    });
+    }); //.addCatch(sendFailureNotification, { errors: ['States.ALL'] });
 
-    const deliverPizza = new tasks.LambdaInvoke(this, 'Request pizza delivery', {
+    const deliverPizza = new tasks.LambdaInvoke(this, 'request pizza delivery', {
       lambdaFunction: props.requestDeliveryLambda,
       payloadResponseOnly: true,
-    });
+    }); //.addCatch(sendFailureNotification, { errors: ['States.ALL'] });
 
-    const readyForPickup = new tasks.LambdaInvoke(this, 'Ready for pickup', {
+    const readyForPickup = new tasks.LambdaInvoke(this, 'ready for pickup', {
       lambdaFunction: props.readyForPickupLambda,
       payloadResponseOnly: true,
     });
@@ -39,7 +39,6 @@ export class StepFunctionStack extends cdk.Stack {
 
     // Pizza Order failure steps
     const sendFailureNotification = new tasks.LambdaInvoke(this, 'Send failure notification', {
-      inputPath: '$.orderValidation',
       lambdaFunction: props.handleErrorLambda,
       payloadResponseOnly: true,
     });
