@@ -21,7 +21,7 @@ Entering the following commands in a terminal:
 
 ### Call the API
 
-After deploying to AWS, test the api with the following command, swapping out the account id and region in the URL. The requests will fail periodically, to simulate a failure. Swapping out "bacon" for "pineapple" in the request will cause the state machine to fail. Changing "isDelivery" to false will cause the state machine to call a different lambda.
+After deploying to AWS, test the api with the following command, swapping out the account id and region in the URL. The requests will fail periodically, to simulate a failure. Swapping out "bacon" for "pineapple" in the request will cause the state machine to fail. Changing "isDelivery" to false will change the output status to "ready for pickup".
 
     curl -X POST \
       -d '{"isDelivery": true, "pizzas": [{"crust": "handTossed", "size": "medium", "toppings": [{"ingredient": "bacon", "location": "whole" }]}]}' \
