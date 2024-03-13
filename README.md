@@ -31,7 +31,7 @@ After deploying to AWS, test the api with the following command, swapping out th
 
 - `npm test`
 
-## Future Enhancments
+## Future Enhancements
 
 Potential enhancements, were this a real project:
 
