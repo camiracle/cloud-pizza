@@ -3,6 +3,7 @@ import lambda = require('@aws-cdk/aws-lambda');
 import sfn = require('@aws-cdk/aws-stepfunctions');
 import tasks = require('@aws-cdk/aws-stepfunctions-tasks');
 import * as logs from '@aws-cdk/aws-logs';
+import { OrderStatus } from '../lambda-fns/shared/types/state-machine-response';
 
 export class StepFunctionStack extends cdk.Stack {
   public readonly stateMachine: sfn.StateMachine; // Expose StateMachine instance
@@ -16,7 +17,7 @@ export class StepFunctionStack extends cdk.Stack {
 
     const validatePizza = new tasks.LambdaInvoke(this, 'validate pizza order', {
       lambdaFunction: props.validateOrderLambda,
-      resultPath: '$.orderValidation',
+      resultPath: '$.orderResult',
       payloadResponseOnly: true,
     });
 
@@ -27,11 +28,15 @@ export class StepFunctionStack extends cdk.Stack {
 
     const deliverPizza = new tasks.LambdaInvoke(this, 'request pizza delivery', {
       lambdaFunction: props.requestDeliveryLambda,
+      resultPath: '$.orderResult',
+      outputPath: '$.orderResult',
       payloadResponseOnly: true,
     });
 
     const readyForPickup = new tasks.LambdaInvoke(this, 'ready for pickup', {
       lambdaFunction: props.readyForPickupLambda,
+      resultPath: '$.orderResult',
+      outputPath: '$.orderResult',
       payloadResponseOnly: true,
     });
 
@@ -45,11 +50,17 @@ export class StepFunctionStack extends cdk.Stack {
 
     const sendFailureNotification = new tasks.LambdaInvoke(this, 'send failure notification', {
       lambdaFunction: props.handleErrorLambda,
+      resultPath: '$.orderResult',
+      outputPath: '$.orderResult',
       payloadResponseOnly: true,
-    }).next(fail);
+    })
+      .next(new sfn.Pass(this, 'Set output', { outputPath: '$.orderResult' }))
+      .next(fail);
 
     //Conditions
-    const isOrderValid = sfn.Condition.booleanEquals('$.orderValidation.isOrderValid', true);
+    const isOrderValid = sfn.Condition.not(
+      sfn.Condition.stringEquals('$.orderResult.status', OrderStatus.NotAllowed)
+    );
     const isDelivery = sfn.Condition.booleanEquals('$.isDelivery', true);
 
     //Express Step function definition

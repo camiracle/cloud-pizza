@@ -1,9 +1,9 @@
 import { PineappleNotAllowedMessage, MissingPizzaMessage } from './shared/error-messages';
-import { Pizza, PizzaToppingIngredient as PizzaToppingType } from './shared/types/pizza';
+import { PizzaToppingIngredient as PizzaToppingType } from './shared/types/pizza';
 import { PizzaOrder } from './shared/types/pizza-order';
-import { PizzaState } from './shared/types/pizza-state';
+import { OrderStatus, StateMachineResponse } from './shared/types/state-machine-response';
 
-export const handler = async function (request?: PizzaOrder): Promise<ValidateOrderResponse> {
+export const handler = async function (request?: PizzaOrder): Promise<StateMachineResponse> {
   console.log('Requested Pizza :', JSON.stringify(request, undefined, 2));
 
   const pizzas = request?.pizzas;
@@ -20,13 +20,9 @@ export const handler = async function (request?: PizzaOrder): Promise<ValidateOr
     errorMessage = PineappleNotAllowedMessage;
   }
 
-  const result = { isOrderValid: isOrderValid, errorMessage: errorMessage };
-  console.log(result);
-
+  const result: StateMachineResponse = {
+    status: isOrderValid ? OrderStatus.Allowed : OrderStatus.NotAllowed,
+    errorMessage,
+  };
   return result;
 };
-
-interface ValidateOrderResponse {
-  isOrderValid: boolean;
-  errorMessage?: string;
-}
