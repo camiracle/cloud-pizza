@@ -8,6 +8,6 @@ export async function CreateDeliveryOrder(request: PizzaOrder): Promise<StateMac
   if (randomNumber <= 1) {
     throw new Error('The pizza delivery service is down.');
   } else {
-    return { driverName: 'Bob', timeEstimate: 900000, status: OrderStatus.ReadyForPickup };
+    return { driverName: 'Bob', timeEstimate: 900000, status: OrderStatus.OutForDelivery };
   }
 }
