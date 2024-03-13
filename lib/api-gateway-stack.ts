@@ -50,7 +50,7 @@ export class ApiGatewayStack extends cdk.Stack {
 
     new apigw.CfnRoute(this, 'DefaultRoute', {
       apiId: api.httpApiId,
-      routeKey: apigw.HttpRouteKey.DEFAULT.key,
+      routeKey: 'POST /pizza/orders',
       target: `integrations/${integ.ref}`,
     });
 
