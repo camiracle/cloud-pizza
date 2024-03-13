@@ -43,12 +43,10 @@ export class StepFunctionStack extends cdk.Stack {
     const succeed = new sfn.Succeed(this, 'pizza success!');
 
     // Pizza Order failure steps
-    const fail = new sfn.Pass(this, 'Set output', { outputPath: '$.orderResult' }).next(
-      new sfn.Fail(this, "we can't make that pizza", {
-        cause: "We can't complete your order.",
-        error: 'Failed To Make Pizza',
-      })
-    );
+    const fail = new sfn.Fail(this, "we can't make that pizza", {
+      cause: "We can't complete your order.",
+      error: 'Failed To Make Pizza',
+    });
 
     const sendFailureNotification = new tasks.LambdaInvoke(this, 'send failure notification', {
       lambdaFunction: props.handleErrorLambda,
