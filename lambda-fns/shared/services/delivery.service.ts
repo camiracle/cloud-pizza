@@ -1,7 +1,7 @@
 import { PizzaOrder } from '../types/pizza-order';
 
 export async function CreateDeliveryOrder(request: PizzaOrder): Promise<DeliveryOrderResponse> {
-  // this is where I'd make calls create an order
+  // Call delivery functionality. Depending on the system, this could be an API, an sqs queue, or directly altering DynamoDB tables.
 
   if (Math.random() * 10 > 8) {
     throw new Error('The pizza delivery service is down.');

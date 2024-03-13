@@ -14,7 +14,7 @@ export class StepFunctionStack extends cdk.Stack {
      * Step Function Starts Here
      */
 
-    const validatePizza = new tasks.LambdaInvoke(this, 'Validate pizza order', {
+    const validatePizza = new tasks.LambdaInvoke(this, 'validate pizza order', {
       lambdaFunction: props.validateOrderLambda,
       resultPath: '$.orderValidation',
       payloadResponseOnly: true,
@@ -23,30 +23,30 @@ export class StepFunctionStack extends cdk.Stack {
     const makePizza = new tasks.LambdaInvoke(this, 'add pizza to queue', {
       lambdaFunction: props.makePizzaLambda,
       payloadResponseOnly: true,
-    }); //.addCatch(sendFailureNotification, { errors: ['States.ALL'] });
+    });
 
     const deliverPizza = new tasks.LambdaInvoke(this, 'request pizza delivery', {
       lambdaFunction: props.requestDeliveryLambda,
       payloadResponseOnly: true,
-    }); //.addCatch(sendFailureNotification, { errors: ['States.ALL'] });
+    });
 
     const readyForPickup = new tasks.LambdaInvoke(this, 'ready for pickup', {
       lambdaFunction: props.readyForPickupLambda,
       payloadResponseOnly: true,
     });
 
-    const succeed = new sfn.Succeed(this, 'Pizza success!');
+    const succeed = new sfn.Succeed(this, 'pizza success!');
 
     // Pizza Order failure steps
-    const sendFailureNotification = new tasks.LambdaInvoke(this, 'Send failure notification', {
-      lambdaFunction: props.handleErrorLambda,
-      payloadResponseOnly: true,
-    });
-
-    const fail = new sfn.Fail(this, "We Can't make that pizza", {
-      cause: 'The pizza request is invalid or not allowed',
+    const fail = new sfn.Fail(this, "we can't make that pizza", {
+      cause: "We can't complete your order.",
       error: 'Failed To Make Pizza',
     });
+
+    const sendFailureNotification = new tasks.LambdaInvoke(this, 'send failure notification', {
+      lambdaFunction: props.handleErrorLambda,
+      payloadResponseOnly: true,
+    }).next(fail);
 
     //Conditions
     const isOrderValid = sfn.Condition.booleanEquals('$.orderValidation.isOrderValid', true);
@@ -57,15 +57,17 @@ export class StepFunctionStack extends cdk.Stack {
       new sfn.Choice(this, 'order valid?')
         .when(
           isOrderValid,
-          makePizza.next(
-            new sfn.Choice(this, 'delivery requested?')
-              .when(isDelivery, deliverPizza)
-              .otherwise(readyForPickup)
-              .afterwards()
-              .next(succeed)
-          )
+          makePizza
+            .addCatch(sendFailureNotification)
+            .next(
+              new sfn.Choice(this, 'delivery requested?')
+                .when(isDelivery, deliverPizza.addCatch(sendFailureNotification))
+                .otherwise(readyForPickup)
+                .afterwards()
+                .next(succeed)
+            )
         ) // Fail order
-        .otherwise(sendFailureNotification.next(fail))
+        .otherwise(fail)
     );
 
     const logGroup = new logs.LogGroup(this, 'PizzaStepFunctionLogGroup');
