@@ -5,7 +5,8 @@ export async function CreatePizzaOrder(request: PizzaOrder) {
 
   console.log(`Initiating pizza request: ${request}`);
 
-  if (Math.random() * 10 > 8) {
+  const randomNumber = Math.round(Math.random() * 10);
+  if (randomNumber <= 1) {
     throw new Error('The pizza order service is down.');
   } else {
     console.log('started cooking the pizza');
