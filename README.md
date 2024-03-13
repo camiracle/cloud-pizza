@@ -10,6 +10,7 @@
 Entering the following commands in a terminal:
 
 - `git clone https://github.com/camiracle/cloud-pizza.git`
+- `cd cloud-pizza`
 - `npm install`
 - `npm run build`
 
@@ -24,7 +25,7 @@ After deploying to AWS, test the api with the following command, swapping out th
 
     curl -X POST \
       -d '{"isDelivery": true, "pizzas": [{"crust": "handTossed", "size": "medium", "toppings": [{"ingredient": "bacon", "location": "whole" }]}]}' \
-      https://[aws account id].execute-api.[aws region].amazonaws.com/pizza/orders
+      https://[apigateway api id].execute-api.[aws region].amazonaws.com/pizza/orders
 
 ### Run Unit Tests
 
